@@ -24,9 +24,22 @@
     <link rel="icon" type="image/png" href="images/favicon.png">
 
     <style>
+        /* import ttf font */
+        @font-face {
+            font-family: 'DMSans';
+            src: url('dmsans/DMSans-Bold.ttf') format('truetype');
+        }
+
         body {
+            font-family: 'DMSans';
             background-color: #000000;
             color: #aaa
+        }
+
+        /* body background starts red, then fades back to black after 500 ms */
+        body.flashred {
+            background-color: #660900;
+            transition: background-color 500ms ease-in-out;
         }
 
         html,
@@ -97,6 +110,16 @@
             document.querySelector('.row').appendChild(box);
         }
 
+        function showIncorrect() {
+            // add flashred class to body
+            document.body.classList.add('flashred');
+
+            // remove flashred class after 500ms
+            setTimeout(() => {
+                document.body.classList.remove('flashred');
+            }, 500);
+        }
+
         let textbuffer = '';
         // if keys are pressed in the document, add to buffer until enter is pressed
         document.addEventListener('keydown', (e) => {
@@ -105,9 +128,23 @@
                 if (values.includes(textbuffer)) {
                     // find box with data value matching
                     const box = document.querySelector(`.ansbox[data-value="${textbuffer}"]`);
-                    box.classList.add('correct');
+
+                    if (box.classList.contains('correct')) {
+                        // if this ticket has already been scanned, flash red
+                        showIncorrect();
+                    } else {
+                        // mark ticket as correct
+                        box.classList.add('correct');
+                    }
+
+                } else {
+                    // if buffer doesn't match anything, flash red
+                    showIncorrect();
                 }
+
+                // clear buffer
                 textbuffer = '';
+                
             } else {
                 textbuffer += e.key;
             }
